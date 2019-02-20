@@ -101,7 +101,7 @@ if (($handle = fopen("air_quality.csv", "r")) !== false) {
 		$out[$x] .= '</records>';
 
 	# write out file
-		file_put_contents('data/' . $x . '.xml', $out[$x]);
+		file_put_contents('data_1/' . $x . '.xml', $out[$x]);
 	}
 
 	# finish ##################################################
