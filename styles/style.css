@@ -7,7 +7,17 @@
     display: none
 }
 
-#chart_div {
+#scatter_chart_div {
+    width: 100%;
+    min-height: 450px;
+}
+
+#line_chart_div {
+    width: 100%;
+    min-height: 450px;
+}
+
+.chart {
     width: 100%;
     min-height: 450px;
 }
