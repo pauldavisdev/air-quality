@@ -26,23 +26,25 @@ for ($i = 0; $i < count($read_path_array); $i++) {
             if ($location_id == $location) {
                     while ($xml_reader->read()) {
                         if ($xml_reader->name == 'reading') {
-                            // get reading time from xml in format HH:mm
+                            # get reading time from xml in format HH:mm
                             $reading_time = substr($xml_reader->getAttribute('time'), 0, 5);
-                            // get reading date from xml
+                            # get reading date from xml
                             $reading_date = $xml_reader->getAttribute('date');
-                            // get year from reading date
+                            # get year from reading date
                             $reading_year = substr($reading_date, -4);
-                            // get reading no2 value from xml
+                            # get reading no2 value from xml
                             $reading_val = $xml_reader->getAttribute('val');
 
-                            // if the reading year and time is equal to the selected year and time, then add to list
+                            # if the reading year and time is equal to the selected year and time, then add to list
                             if ($reading_year == $year && $reading_time == $time) {
                                 $readings[$reading_date] = $reading_val;//$xml_reader->getAttribute('date');
                             }
                         }
                     }
+                # no more readings in current xml file, break out of all loops and echo the generated readings list
                 break 2;
             } else {
+                # this xml file is not for the selected location, break to for loop to read in next xml file in data_2 dir
                 break;
             }
         }
