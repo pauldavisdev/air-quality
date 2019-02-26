@@ -1,13 +1,14 @@
 // Load the Visualization API and the corechart package.
 google.charts.load('current', { 'packages': ['corechart'] });
 
-// Set a callback to run when the Google Visualization API is loaded.
-google.charts.setOnLoadCallback(drawScatterChart);
+
+var scatterData;
+
+var lineData;
 
 //on document load, populate dropdown boxes
 window.onload = function () {
     getScatterData();
-    //getLineData();
 }
 
 $(document).ready(function () {
@@ -17,6 +18,7 @@ $(document).ready(function () {
 $('select').change(function () {
     console.log($('#location').val());
     getScatterData();
+    getLineData();
 });
 
 function getLocation() {
@@ -73,7 +75,8 @@ function getScatterData() {
         type: 'POST',
         data: JSON.stringify({ "location": $('#location').val(), "year": $('#year').val(), "time": $('#time').val() }),
         success: function (data) {
-            drawScatterChart(data)
+            scatterData = data;
+            drawScatterChart()
         },
         error: function (xhr, status, error) {
             var err = JSON.parse(xhr.responseText);
@@ -85,14 +88,14 @@ function getScatterData() {
 // Callback that creates and populates a data table,
 // instantiates the scatter chart, passes in the data and
 // draws it.
-function drawScatterChart(readingData) {
+function drawScatterChart() {
 
     var result = [];
     // format date string as date and no2 value as number
-    for (var i in readingData) {
+    for (var i in scatterData) {
         var from = i.split("/")
         var f = new Date(from[2], from[1] - 1, from[0])
-        result.push([f, parseInt(readingData[i])]);
+        result.push([f, parseInt(scatterData[i])]);
     }
 
     console.log(result);
@@ -124,7 +127,8 @@ function getLineData() {
         data: JSON.stringify({ "location": $('#location').val(), "date": $('#datepicker').val() }),
         success: function (data) {
             console.log(data);
-            drawLineChart(data);
+            lineData = data;
+            drawLineChart();
         },
         error: function (xhr, status, error) {
             var err = JSON.parse(xhr.responseText);
@@ -133,15 +137,15 @@ function getLineData() {
     });
 }
 
-function drawLineChart(readingData) {
+function drawLineChart() {
 
     result = [];
-    for (var i in readingData) {
+    for (var i in lineData) {
         // format data into timeofday and number format
         // timeofday must be an array of at least 3 numbers in form of [hours, minutes, seconds]
-        var time = i.split(':').concat('0');       
+        var time = i.split(':').concat('0');
         time = time.map(v => parseInt(v, 10));
-        result.push([time, parseInt(readingData[i])]);
+        result.push([time, parseInt(lineData[i])]);
     }
 
     // Create the data table.
@@ -164,8 +168,14 @@ function drawLineChart(readingData) {
 
 }
 
-$(window).resize(function () {
-    drawScatterChart();
+
+$(window).on('resize', function () {
+    var scatter = document.getElementById('scatter_chart_div');
+    if (scatter.style.display === 'none') {
+        drawLineChart();
+    } else {
+        drawScatterChart();
+    }
 });
 
 const datepicker = document.getElementById('datepicker');
@@ -176,29 +186,33 @@ datepicker.addEventListener("change", function () {
 
 
 
-$("#chart-select-buttons :input").change(function() {
-    var scatter = document.getElementById('scatter');
-    var line = document.getElementById('line');
+$("#chart-select-buttons :input").change(function () {
+    var scatter = document.getElementById('scatter_chart_div');
+    var line = document.getElementById('line_chart_div');
     var scatterOptions = document.getElementsByClassName('scatter-options');
     var lineOptions = document.getElementsByClassName('line-options');
     if (scatter.style.display === 'none') {
+        getScatterData();
         scatter.style.display = 'block';
         line.style.display = 'none';
         for (let index = 0; index < scatterOptions.length; index++) {
-            scatterOptions[index].style.display = 'block';       
+            scatterOptions[index].style.display = 'block';
         }
         for (let index = 0; index < lineOptions.length; index++) {
-            lineOptions[index].style.display = 'none';       
+            lineOptions[index].style.display = 'none';
         }
+
     } else {
+        getLineData();
         line.style.display = 'block';
         scatter.style.display = 'none';
         for (let index = 0; index < scatterOptions.length; index++) {
-            scatterOptions[index].style.display = 'none';       
+            scatterOptions[index].style.display = 'none';
         }
         for (let index = 0; index < lineOptions.length; index++) {
-            lineOptions[index].style.display = 'block';       
+            lineOptions[index].style.display = 'block';
         }
+
     }
 });
 
