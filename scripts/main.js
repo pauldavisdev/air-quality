@@ -4,46 +4,10 @@ google.charts.load('current', { 'packages': ['corechart'] });
 // Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(drawScatterChart);
 
-var readingData;
-
-// Callback that creates and populates a data table,
-// instantiates the scatter chart, passes in the data and
-// draws it.
-function drawScatterChart() {
-
-    var result = [];
-    // format date string as date and no2 value as number
-    for (var i in readingData) {
-        var from = i.split("/")
-        var f = new Date(from[2], from[1] - 1, from[0])
-        result.push([f, parseInt(readingData[i])]);
-    }
-
-    console.log(result);
-    // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('date', 'Date');
-    data.addColumn('number', 'no2 reading');
-    data.addRows(result);
-
-    // Set chart options
-    var options = {
-        'title': 'Air Quality',
-        'hAxis': { title: 'Date' },
-        'vAxis': { title: 'no2 level' },
-        'height': 600
-    };
-
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.ScatterChart(document.getElementById('scatter_chart_div'));
-    chart.draw(data, options);
-}
-
 //on document load, populate dropdown boxes
 window.onload = function () {
     getScatterData();
-    drawScatterChart();
-    getLineData();
+    //getLineData();
 }
 
 $(document).ready(function () {
@@ -53,7 +17,6 @@ $(document).ready(function () {
 $('select').change(function () {
     console.log($('#location').val());
     getScatterData();
-    drawScatterChart();
 });
 
 function getLocation() {
@@ -102,6 +65,7 @@ function getLocation() {
     });
 }
 
+/* Scatter Graph Functions */
 function getScatterData() {
     $.ajax({
         url: 'app/get_scatter_data.php',
@@ -109,8 +73,7 @@ function getScatterData() {
         type: 'POST',
         data: JSON.stringify({ "location": $('#location').val(), "year": $('#year').val(), "time": $('#time').val() }),
         success: function (data) {
-            readingData = data;
-            console.log(data);
+            drawScatterChart(data)
         },
         error: function (xhr, status, error) {
             var err = JSON.parse(xhr.responseText);
@@ -119,24 +82,123 @@ function getScatterData() {
     });
 }
 
-function getLineData() {
-    // $.ajax({
-    //     url: 'app/get_line_data.php',
-    //     dataType: 'json',
-    //     type: 'POST',
-    //     data: JSON.stringify({ "location": $('#location').val(), "year": $('#year').val(), "time": $('#time').val() }),
-    //     success: function (data) {
-    //         readingData = data;
-    //         drawScatterChart();
-    //         console.log(data);
-    //     },
-    //     error: function (xhr, status, error) {
-    //         var err = JSON.parse(xhr.responseText);
-    //         alert(err.message);
-    //     }
-    // });
+// Callback that creates and populates a data table,
+// instantiates the scatter chart, passes in the data and
+// draws it.
+function drawScatterChart(readingData) {
+
+    var result = [];
+    // format date string as date and no2 value as number
+    for (var i in readingData) {
+        var from = i.split("/")
+        var f = new Date(from[2], from[1] - 1, from[0])
+        result.push([f, parseInt(readingData[i])]);
+    }
+
+    console.log(result);
+    // Create the data table.
+    var data = new google.visualization.DataTable();
+    data.addColumn('date', 'Date');
+    data.addColumn('number', 'no2 reading');
+    data.addRows(result);
+
+    // Set chart options
+    var options = {
+        'title': 'Air Quality',
+        'hAxis': { title: 'Date' },
+        'vAxis': { title: 'no2 level' },
+        'height': 600
+    };
+
+    // Instantiate and draw our chart, passing in some options.
+    var chart = new google.visualization.ScatterChart(document.getElementById('scatter_chart_div'));
+    chart.draw(data, options);
 }
 
-$(window).resize(function(){
-   drawScatterChart();
-  });
+/* Line Graph Functions */
+function getLineData() {
+    $.ajax({
+        url: 'app/get_line_data.php',
+        dataType: 'json',
+        type: 'POST',
+        data: JSON.stringify({ "location": $('#location').val(), "date": $('#datepicker').val() }),
+        success: function (data) {
+            console.log(data);
+            drawLineChart(data);
+        },
+        error: function (xhr, status, error) {
+            var err = JSON.parse(xhr.responseText);
+            alert(err.message);
+        }
+    });
+}
+
+function drawLineChart(readingData) {
+
+    result = [];
+    for (var i in readingData) {
+        // format data into timeofday and number format
+        // timeofday must be an array of at least 3 numbers in form of [hours, minutes, seconds]
+        var time = i.split(':').concat('0');       
+        time = time.map(v => parseInt(v, 10));
+        result.push([time, parseInt(readingData[i])]);
+    }
+
+    // Create the data table.
+    var data = new google.visualization.DataTable();
+    data.addColumn('timeofday', 'Time of Day');
+    data.addColumn('number', 'no2 reading');
+    data.addRows(result);
+
+    // Set chart options
+    var options = {
+        'title': 'Air Quality Over a 24 Hour Period',
+        'hAxis': { title: 'Time' },
+        'vAxis': { title: 'no2 level' },
+        'height': 600
+    };
+
+    // Instantiate and draw our chart, passing in some options.
+    var chart = new google.visualization.ScatterChart(document.getElementById('line_chart_div'));
+    chart.draw(data, options);
+
+}
+
+$(window).resize(function () {
+    drawScatterChart();
+});
+
+const datepicker = document.getElementById('datepicker');
+
+datepicker.addEventListener("change", function () {
+    getLineData();
+});
+
+
+
+$("#chart-select-buttons :input").change(function() {
+    var scatter = document.getElementById('scatter');
+    var line = document.getElementById('line');
+    var scatterOptions = document.getElementsByClassName('scatter-options');
+    var lineOptions = document.getElementsByClassName('line-options');
+    if (scatter.style.display === 'none') {
+        scatter.style.display = 'block';
+        line.style.display = 'none';
+        for (let index = 0; index < scatterOptions.length; index++) {
+            scatterOptions[index].style.display = 'block';       
+        }
+        for (let index = 0; index < lineOptions.length; index++) {
+            lineOptions[index].style.display = 'none';       
+        }
+    } else {
+        line.style.display = 'block';
+        scatter.style.display = 'none';
+        for (let index = 0; index < scatterOptions.length; index++) {
+            scatterOptions[index].style.display = 'none';       
+        }
+        for (let index = 0; index < lineOptions.length; index++) {
+            lineOptions[index].style.display = 'block';       
+        }
+    }
+});
+

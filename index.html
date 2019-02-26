@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="styles/style.css" rel="stylesheet">
 </head>
 
 <body>
   <div class="container">
     <div class="row mt-3 justify-content-center">
-      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+      <div id="chart-select-buttons" class="btn-group btn-group-toggle" data-toggle="buttons">
         <label class="btn btn-primary active">
           <input type="radio" name="options" id="by-year" autocomplete="off" checked> Per Time By Year
         </label>
@@ -20,12 +21,12 @@
       </div>
     </div>
     <div class="row mt-3">
-      <div class="form-group col-md-4">
+      <div class="common form-group col-md-4">
         <label for="location">Location</label>
         <select class="form-control" id="location">
         </select>
       </div>
-      <div class="form-group col-md-4">
+      <div class="scatter-options form-group col-md-4">
         <label for="year">Year</label>
         <select class="form-control" id="year">
           <option>2014</option>
@@ -34,15 +35,24 @@
           <option>2017</option>
         </select>
       </div>
-      <div class="form-group col-md-4">
+      <div class="scatter-options form-group col-md-4">
         <label for="time">Time</label>
         <select class="form-control" id="time">
         </select>
       </div>
-      <div id="test"></div>
+      <div class="line-options form-group col-md-4">
+          <label for="datepicker">Reading Date</label>
+          <input class="form-control" type="date" id="datepicker">
+        </div>
     </div>
-    <!--Div that will hold the pie chart-->
-    <div id="chart_div"></div>
+    <!--Div that will hold the scatter chart-->
+    <div id="scatter">
+      <div id="scatter_chart_div"></div>
+    </div>
+    <div id="line">
+
+      <div id="line_chart_div"></div>
+    </div>
   </div>
   <!--Load the AJAX API-->
   <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -50,8 +60,7 @@
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
