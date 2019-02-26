@@ -31,73 +31,37 @@ if (($handle = fopen("air_quality.csv", "r")) !== false) {
 	$out['newfoundland_way'] = '<records>'; # 11
 
 	while (($data = fgetcsv($handle, 200, ",")) !== false) {
-
+		$count++;
 		switch ($data[0]) {
 			case 3:
-				$rec = '<row count="' . $count . '" id="' . $row . '">';
-
-				for ($c = 0; $c < $cols; $c++) {
-					$rec .= '<' . trim($header[$c]) . ' val="' . trim($data[$c]) . '"/>';
-				}
-				$rec .= '</row>';
-				$count++;
-				$out['brislington'] .= $rec;
+				$out['brislington'] .= get_record($header, $data, $count, $row, $cols);
+		
 				break;
 			case 6:
-				$rec = '<row count="' . $count . '" id="' . $row . '">';
+				$out['fishponds'] .= get_record($header, $data, $count, $row, $cols);
 
-				for ($c = 0; $c < $cols; $c++) {
-					$rec .= '<' . trim($header[$c]) . ' val="' . trim($data[$c]) . '"/>';
-				}
-				$rec .= '</row>';
-				$count++;
-				$out['fishponds'] .= $rec;
 				break;
 			case 8:
-				$rec = '<row count="' . $count . '" id="' . $row . '">';
-
-				for ($c = 0; $c < $cols; $c++) {
-					$rec .= '<' . trim($header[$c]) . ' val="' . trim($data[$c]) . '"/>';
-				}
-				$rec .= '</row>';
-				$count++;
-				$out['parson_st'] .= $rec;
+				$out['parson_st'] .= get_record($header, $data, $count, $row, $cols);
+	
 				break;
 			case 9:
-				$rec = '<row count="' . $count . '" id="' . $row . '">';
-
-				for ($c = 0; $c < $cols; $c++) {
-					$rec .= '<' . trim($header[$c]) . ' val="' . trim($data[$c]) . '"/>';
-				}
-				$rec .= '</row>';
-				$count++;
-				$out['rupert_st'] .= $rec;
+				$out['rupert_st'] .= get_record($header, $data, $count, $row, $cols);
+			
 				break;
 			case 10:
-				$rec = '<row count="' . $count . '" id="' . $row . '">';
-
-				for ($c = 0; $c < $cols; $c++) {
-					$rec .= '<' . trim($header[$c]) . ' val="' . trim($data[$c]) . '"/>';
-				}
-				$rec .= '</row>';
-				$count++;
-				$out['wells_rd'] .= $rec;
+				$out['wells_rd'] .= get_record($header, $data, $count, $row, $cols);
+			
 				break;
 			case 11:
-				$rec = '<row count="' . $count . '" id="' . $row . '">';
-
-				for ($c = 0; $c < $cols; $c++) {
-					$rec .= '<' . trim($header[$c]) . ' val="' . trim($data[$c]) . '"/>';
-				}
-				$rec .= '</row>';
-				$count++;
-				$out['newfoundland_way'] .= $rec;
+				$out['newfoundland_way'] .= get_record($header, $data, $count, $row, $cols);
+				
 				break;
 			default:
-				echo "Your favorite color is neither red, blue, nor green!";
-
-				$row++;
+				echo "default break";
+			
 		}
+		$row++;
 	}
 
 	foreach ($out as $x => $x_value) {
@@ -117,4 +81,15 @@ if (($handle = fopen("air_quality.csv", "r")) !== false) {
 	fclose($handle);
 }
 echo "....all done!";
+
+function get_record($header, $data, $count, $row, $cols) {
+	$rec = '<row count="' . $count . '" id="' . $row . '">';
+
+	for ($c = 0; $c < $cols; $c++) {
+		$rec .= '<' . trim($header[$c]) . ' val="' . trim($data[$c]) . '"/>';
+	}
+	$rec .= '</row>';
+	
+	return $rec;
+}
 ?>
