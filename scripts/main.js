@@ -1,9 +1,10 @@
 // Load the Visualization API and the corechart package.
 google.charts.load('current', { 'packages': ['corechart'] });
 
-
+// holds the last data returned by get_scatter_data.php
 var scatterData;
 
+// holds the last data returned by get_line_data.php
 var lineData;
 
 //on document load, populate dropdown boxes
@@ -11,8 +12,10 @@ window.onload = function () {
     getScatterData();
 }
 
+// on document ready, populate dropdown
 $(document).ready(function () {
-    getLocation();
+    setLocationOptions();
+    setTimeOptions();
 });
 
 $('select').change(function () {
@@ -21,7 +24,56 @@ $('select').change(function () {
     getLineData();
 });
 
-function getLocation() {
+// redraws chart upon resize - makes the page feel more responsive
+$(window).on('resize', function () {
+    var scatter = document.getElementById('scatter_chart_div');
+    if (scatter.style.display === 'none') {
+        drawLineChart();
+    } else {
+        drawScatterChart();
+    }
+});
+
+// add event listener to datepicker
+const datepicker = document.getElementById('datepicker');
+
+datepicker.addEventListener("change", function () {
+    getLineData();
+});
+
+// this function handles switching between the scatter and line charts
+$("#chart-select-buttons :input").change(function () {
+    var scatter = document.getElementById('scatter_chart_div');
+    var line = document.getElementById('line_chart_div');
+    var scatterOptions = document.getElementsByClassName('scatter-options');
+    var lineOptions = document.getElementsByClassName('line-options');
+    if (scatter.style.display === 'none') {
+        getScatterData();
+        scatter.style.display = 'block';
+        line.style.display = 'none';
+        for (let index = 0; index < scatterOptions.length; index++) {
+            scatterOptions[index].style.display = 'block';
+        }
+        for (let index = 0; index < lineOptions.length; index++) {
+            lineOptions[index].style.display = 'none';
+        }
+
+    } else {
+        getLineData();
+        line.style.display = 'block';
+        scatter.style.display = 'none';
+        for (let index = 0; index < scatterOptions.length; index++) {
+            scatterOptions[index].style.display = 'none';
+        }
+        for (let index = 0; index < lineOptions.length; index++) {
+            lineOptions[index].style.display = 'block';
+        }
+
+    }
+});
+
+// populate location dropdown box with all xml file locations
+function setLocationOptions() {
     $.ajax({
         type: "GET",
         url: "app/get_locations.php",
@@ -40,31 +92,31 @@ function getLocation() {
 
             // append generated HTML to dropdown list
             $('#location').append(locationString);
-
-            // below code populates times dropdown list
-            // begin: code copied from stack overflow answer found at https://codereview.stackexchange.com/a/121097
-            var quarterHours = ["00", "15", "30", "45"];
-
-            var times = [];
-            for (var i = 0; i < 24; i++) {
-                for (var j = 0; j < 4; j++) {
-                    // Using slice() with negative index => You get always (the last) two digit numbers.
-                    times.push(('0' + i).slice(-2) + ":" + quarterHours[j]);
-                }
-            }
-            // end: copied from stack overflow answer found at https://codereview.stackexchange.com/a/121097
-
-            var timeString = '';
-
-            for (var i = 0; i < times.length; i++) {
-                timeString += "<option value='" + times[i] + "'> " + times[i] + "</option>";
-            }
-
-            $('#time').append(timeString);
-
         }
-
     });
+}
+
+function setTimeOptions() {
+    // below code populates times dropdown list
+    // begin: code copied from stack overflow answer found at https://codereview.stackexchange.com/a/121097
+    var quarterHours = ["00", "15", "30", "45"];
+
+    var times = [];
+    for (var i = 0; i < 24; i++) {
+        for (var j = 0; j < 4; j++) {
+            // Using slice() with negative index => You get always (the last) two digit numbers.
+            times.push(('0' + i).slice(-2) + ":" + quarterHours[j]);
+        }
+    }
+    // end: copied from stack overflow answer found at https://codereview.stackexchange.com/a/121097
+
+    var timeString = '';
+
+    for (var i = 0; i < times.length; i++) {
+        timeString += "<option value='" + times[i] + "'> " + times[i] + "</option>";
+    }
+
+    $('#time').append(timeString);
 }
 
 /* Scatter Graph Functions */
@@ -85,9 +137,7 @@ function getScatterData() {
     });
 }
 
-// Callback that creates and populates a data table,
-// instantiates the scatter chart, passes in the data and
-// draws it.
+// draw scatter chart to scatter_chart_div
 function drawScatterChart() {
 
     var result = [];
@@ -137,6 +187,7 @@ function getLineData() {
     });
 }
 
+// draw line chart to line_chart_div
 function drawLineChart() {
 
     result = [];
@@ -167,52 +218,3 @@ function drawLineChart() {
     chart.draw(data, options);
 
 }
-
-
-$(window).on('resize', function () {
-    var scatter = document.getElementById('scatter_chart_div');
-    if (scatter.style.display === 'none') {
-        drawLineChart();
-    } else {
-        drawScatterChart();
-    }
-});
-
-const datepicker = document.getElementById('datepicker');
-
-datepicker.addEventListener("change", function () {
-    getLineData();
-});
-
-
-
-$("#chart-select-buttons :input").change(function () {
-    var scatter = document.getElementById('scatter_chart_div');
-    var line = document.getElementById('line_chart_div');
-    var scatterOptions = document.getElementsByClassName('scatter-options');
-    var lineOptions = document.getElementsByClassName('line-options');
-    if (scatter.style.display === 'none') {
-        getScatterData();
-        scatter.style.display = 'block';
-        line.style.display = 'none';
-        for (let index = 0; index < scatterOptions.length; index++) {
-            scatterOptions[index].style.display = 'block';
-        }
-        for (let index = 0; index < lineOptions.length; index++) {
-            lineOptions[index].style.display = 'none';
-        }
-
-    } else {
-        getLineData();
-        line.style.display = 'block';
-        scatter.style.display = 'none';
-        for (let index = 0; index < scatterOptions.length; index++) {
-            scatterOptions[index].style.display = 'none';
-        }
-        for (let index = 0; index < lineOptions.length; index++) {
-            lineOptions[index].style.display = 'block';
-        }
-
-    }
-});
-
