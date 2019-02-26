@@ -1,19 +1,19 @@
 <?php
+include('file_reader.php');
+
 echo "normalising data .. wait\n\n";
 
 $xml_reader = new XMLReader();
 $xml_writer = new XMLWriter();
 
-# name of directory to read from and write to (relative)
-$read_dir = 'data_1';
 $write_dir = 'data_2';
 
-if (file_exists($read_dir)) {
+if (file_exists($unclean_data_dir)) {
 
-    $read_file_path_array = get_read_path_array($read_dir);
+    $read_file_path_array = get_read_path_array($unclean_data_dir);
 
     # create array of all file paths to write to
-    $write_file_path_array = get_write_path_array($read_file_path_array, $write_dir);
+    $write_file_path_array = get_write_path_array($read_file_path_array, $clean_data_dir);
 
     for ($i = 0; $i < count($read_file_path_array); $i++) {
 
@@ -98,22 +98,6 @@ if (file_exists($read_dir)) {
     echo "\n\ndata normalised!";
 } else {
     echo 'Read directory does not exist';
-}
-
-function get_read_path_array($read_dir)
-{
-    # get list of files to normalise from data_1 folder
-    $read_path = getcwd() . '/' . $read_dir . '/';
-    $read_files = scandir($read_path);
-    $read_files = array_values(array_diff(scandir($read_path), array('.', '..')));
-
-    $read_file_path_array = array();
-
-    # create array of all file paths to read from
-    foreach ($read_files as $file) {
-        array_push($read_file_path_array, $read_dir . '/' . $file);
-    }
-    return $read_file_path_array;
 }
 
 function get_write_path_array($read_file_path_array, $write_dir)
