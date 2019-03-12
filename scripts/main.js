@@ -160,7 +160,8 @@ function drawScatterChart() {
         'title': 'Air Quality',
         'hAxis': { title: 'Date' },
         'vAxis': { title: 'no2 level' },
-        'height': 600
+        'height': 600,
+        'pointSize': 4
     };
 
     // Instantiate and draw our chart, passing in some options.
@@ -199,10 +200,12 @@ function drawLineChart() {
         result.push([time, parseInt(lineData[i])]);
     }
 
+    console.log(result);
+
     // sort times in ascending order
     // this makes sure that the line starts at 00:00 and ends at 23:45
     result.sort( function(a, b) {
-        return a[0][0] - b[0][0];
+        return a[0][0] - b[0][0] || a[0][1] - b[0][1];
     });
 
     // Create the data table.
