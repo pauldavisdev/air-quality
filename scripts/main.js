@@ -199,11 +199,18 @@ function drawLineChart() {
         result.push([time, parseInt(lineData[i])]);
     }
 
+    // sort times in ascending order
+    // this makes sure that the line starts at 00:00 and ends at 23:45
+    result.sort( function(a, b) {
+        return a[0][0] - b[0][0];
+    });
+
     // Create the data table.
     var data = new google.visualization.DataTable();
     data.addColumn('timeofday', 'Time of Day');
     data.addColumn('number', 'no2 reading');
     data.addRows(result);
+    
 
     // Set chart options
     var options = {
@@ -214,7 +221,7 @@ function drawLineChart() {
     };
 
     // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.ScatterChart(document.getElementById('line_chart_div'));
+    var chart = new google.visualization.LineChart(document.getElementById('line_chart_div'));
     chart.draw(data, options);
 
 }
