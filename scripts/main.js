@@ -18,6 +18,7 @@ $(document).ready(function () {
     setTimeOptions();
 });
 
+// gets chart date from XML when a select box value is changed
 $('select').change(function () {
     console.log($('#location').val());
     getScatterData();
@@ -96,8 +97,11 @@ function setLocationOptions() {
     });
 }
 
+// this function fills the time select box values
+// contains code from another author - detailed in comments
 function setTimeOptions() {
     // below code populates times dropdown list
+
     // begin: code copied from stack overflow answer found at https://codereview.stackexchange.com/a/121097
     var quarterHours = ["00", "15", "30", "45"];
 
